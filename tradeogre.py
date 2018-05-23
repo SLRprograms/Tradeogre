@@ -88,4 +88,54 @@ class Commands(object):
                 print 'FAILED orderBook ' + str(attempts)
                 time.sleep(60)
 
-
+    #returns the trade history of the product
+    #orders in order from newest to oldest
+    #gets 'date','price','type','quantity'
+    def tradeHistory(self,product):
+        attempts = 0
+        while True:
+            try:
+                r = requests.get(self.api_url + '/history/BTC-'+str(product))
+                return r.json()
+            except:
+                attempts += 1
+                print 'FAILED tradeHistory '+str(attempts)
+                time.sleep(60)
+    #buys returns orderID  
+    def buy(amount,price,product):#pos used for remembering trade history
+        attempts = 0
+        while True:
+            try:
+                order = {'market': 'BTC-'+str(product),'quantity': str(float('{:.08f}'.format(amount))),'price': str('{:.08f}'.format(price))}
+                r = requests.post(self.api_url + '/order/buy',data=order,auth=(self.key,self.secret))
+                return r.json()
+            except:
+                print 'FAILED buy '+str(attempts)
+                time.sleep(60)
+    #sells returns orderID
+    def sell(amount,price,product):#pos used for remembering trade history
+        attempts = 0
+        while True:
+            try:
+                order = {'market': 'BTC-'+str(product),'quantity': str(float('{:.08f}'.format(amount))),'price': str('{:.08f}'.format(price))}
+                r = requests.post(self.api_url + '/order/sell',data=order,auth=(self.key,self.secret))
+                return r.json()
+            except:
+                print 'FAILED buy '+str(attempts)
+                time.sleep(60)
+            
+    #cancels all orders for the side 'buy' or 'sell'
+    def cancelAllOrders(side,currency):
+        attempt = 0
+        while True:
+            try:
+                market = {'market': 'BTC-'+str(currency)}
+                r = requests.post(api_url + '/account/orders',data=market,auth=(API_KEY,API_SECRET))
+                for i in r.json():
+                    if i['type'] == _type:
+                        order = {'uuid' : i['uuid']}
+                        o = requests.post(api_url + '/order/cancel',data=order,auth=(API_KEY,API_SECRET))
+                return True
+            except:
+                print 'FAILED cancelOrders '+str(attempts)
+                time.sleep(60)
